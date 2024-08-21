@@ -1,36 +1,38 @@
-version: "3.8"
-
 services:
 
   db-dev:
-    image: mysql:8.0
-    expose: 
-      - "3306"
+    build: 
+      context: ./db
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MYSQL_DATABASE: users
       MYSQL_USER: 'admin'
       MYSQL_PASSWORD: 'db4dev$'
       MYSQL_ROOT_PASSWORD: 'db4dev$'
     volumes:
-      - db-dev-data:/var/lib/mysql
+      - my-sql:/var/lib/mysql
+    networks:
+      - api
     
   api-dev:
-    build: ./
-    volumes:
-      - ./app/:/usr/src/app
-    ports: 
+    build:
+      context: ./app
+    ports:
       - "8081:5000"
     environment:
-      DB_HOST: db-dev
-      DB_USER: 'admin'
-      DB_PASS: 'db4dev$'
-      DB_PORT: '3306'
+      - DB_HOST=db-dev
+      - DB_USER=admin
+      - DB_PASSWORD=db4dev$
+      - DB_NAME=users
+    networks:
+      - api
     depends_on:
       - db-dev
-    command: ["python", "app.py"]
-    restart: always
+  
+networks:
+  api:
+    driver: bridge
 
 volumes:
-  db-dev-data:
+  my-sql:

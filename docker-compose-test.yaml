@@ -1,37 +1,38 @@
-version: "3.8"
-
 services:
-  
+
   db-test:
-    image: mysql:8.0
-    expose: 
-      - "3306"
+    build: 
+      context: ./db
     ports:
-      - "3307:3306"
+      - "3308:3306"
     environment:
       MYSQL_DATABASE: users
       MYSQL_USER: 'admin'
       MYSQL_PASSWORD: 'db4test$'
       MYSQL_ROOT_PASSWORD: 'db4test$'
     volumes:
-      - db-test-data:/var/lib/mysql
-
+      - my-sql-test:/var/lib/mysql
+    networks:
+      - api2
+    
   api-test:
-    build: ./
-    volumes:
-      - ./app/:/usr/src/app
-    ports: 
+    build:
+      context: ./app
+    ports:
       - "8082:5000"
     environment:
-      DB_HOST: db-test
-      DB_USER: 'admin'
-      DB_PASS: 'db4test$'
-      DB_PORT: '3306'
+      - DB_HOST=db-test
+      - DB_USER=admin
+      - DB_PASSWORD=db4test$
+      - DB_NAME=users
+    networks:
+      - api2
     depends_on:
       - db-test
-    command: ["python", "app.py"]
-    restart: always
 
+networks:
+    api2:
+      driver: bridge
+  
 volumes:
-  db-test-data:
-
+    my-sql-test:
