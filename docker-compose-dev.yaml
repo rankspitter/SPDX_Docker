@@ -3,6 +3,7 @@ services:
   db-dev:
     build: 
       context: ./db
+    image: spdx/db
     ports:
       - "3307:3306"
     environment:
@@ -18,6 +19,7 @@ services:
   api-dev:
     build:
       context: ./app
+    image: spdx/api
     ports:
       - "8081:5000"
     environment:
